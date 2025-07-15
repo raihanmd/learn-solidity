@@ -1,0 +1,5 @@
+{
+  "solidity.packageDefaultDependenciesDirectory": "lib",
+  "solidity.packageDefaultDependenciesContractsDirectory": "",
+  "solidity.remappings": ["@chainlink/contracts=lib/chainlink/contracts/"]
+}
