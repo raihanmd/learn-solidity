@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.30;
+pragma solidity ^0.8.29;
 
 import {PriceConsumer} from "./lib/PriceConsumer.sol";
 
@@ -55,10 +55,14 @@ contract FundMe {
     }
 
     // * Called when calldata to it is blank
-    receive() external payable {}
+    receive() external payable {
+        fund();
+    }
 
     // * Called when calldata to it is not blank, then the function that point to be called is not defined on contract
-    fallback() external payable {}
+    fallback() external payable {
+        fund();
+    }
 
     modifier _onlyOwner() {
         require(msg.sender == i_owner, Unauthorized());

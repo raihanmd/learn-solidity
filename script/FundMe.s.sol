@@ -2,18 +2,20 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "../src/_first/Counter.sol";
+import {FundMe} from "../src/fund-me/FundMe.sol";
 
-contract CounterScript is Script {
-    Counter public counter;
+contract FundMeScript is Script {
+    FundMe public fundMe;
 
     function setUp() public {}
 
-    function run() public {
+    function run() public returns (FundMe) {
         vm.startBroadcast();
 
-        counter = new Counter();
+        fundMe = new FundMe();
 
         vm.stopBroadcast();
+
+        return fundMe;
     }
 }
