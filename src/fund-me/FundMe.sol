@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+
 import {PriceConsumer} from "./lib/PriceConsumer.sol";
 
 error Unauthorized();
@@ -9,20 +11,23 @@ error Forbidden(string message);
 contract FundMe {
     using PriceConsumer for uint256;
 
-    uint256 constant MINIMUM_USD = 5e18;
+    uint256 public constant MINIMUM_USD = 5e18;
 
-    address immutable i_owner;
-    address[] funders;
+    address public immutable i_owner;
+    address[] public funders;
     mapping(address funder => uint256 amountFunded) public funderToAmountFunded;
 
-    constructor() {
+    AggregatorV3Interface private immutable i_priceFeed;
+
+    constructor(address _priceFeed) {
         i_owner = msg.sender;
+        i_priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
     function fund() public payable {
         require(
             // PriceConsumer.getConversionRate(msg.value) >= MINIMUM_USD, //! Before
-            msg.value.getConversionRate() >= MINIMUM_USD, //* After before, bisa di langsung pake
+            msg.value.getConversionRate(i_priceFeed) >= MINIMUM_USD, //* After before, bisa di langsung pake
             Forbidden("Minimal value worth 5 USD")
         );
 
@@ -44,10 +49,7 @@ contract FundMe {
             //  * call (lower level stuff), params 2 is returned from func that called in `.call()` params
             (
                 bool successCall, // * params 2: `bytes memory data`
-
-            ) = payable(funders[i]).call{
-                    value: funderToAmountFunded[funders[i]]
-                }("");
+            ) = payable(funders[i]).call{value: funderToAmountFunded[funders[i]]}("");
             require(successCall, "Call failed");
         }
 
@@ -62,6 +64,10 @@ contract FundMe {
     // * Called when calldata to it is not blank, then the function that point to be called is not defined on contract
     fallback() external payable {
         fund();
+    }
+
+    function getPriceConsumerVersion() public view returns (uint256) {
+        return PriceConsumer.getVersion(i_priceFeed);
     }
 
     modifier _onlyOwner() {

@@ -1,9 +1,0 @@
-{
-  "solidity.packageDefaultDependenciesContractsDirectory": "src",
-  "solidity.packageDefaultDependenciesDirectory": "lib",
-  "solidity.remappings": [
-    "@chainlink/contracts/=lib/chainlink/contracts/",
-    "chainlink/=lib/chainlink/",
-    "forge-std/=lib/forge-std/src/"
-  ]
-}

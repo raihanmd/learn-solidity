@@ -10,7 +10,7 @@ contract StorageFactory {
         storages.push(new Storage());
     }
 
-    function sStore(uint _index, uint256 _number) public {
+    function sStore(uint256 _index, uint256 _number) public {
         storages[_index].store(_number);
     }
 }
