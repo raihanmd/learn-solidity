@@ -11,8 +11,12 @@ struct NetworkConfig {
 contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
 
+    uint256 constant SEPOLIA_CHAIN_ID = 11155111;
+    uint8 constant ETH_DECIMAL = 8;
+    int256 constant ETH_PRICE = 2500e8;
+
     constructor() {
-        if (block.chainid == 11155111) {
+        if (block.chainid == SEPOLIA_CHAIN_ID) {
             activeNetworkConfig = getSepoliaEthConfig();
         } else {
             activeNetworkConfig = getAnvilConfig();
@@ -24,8 +28,12 @@ contract HelperConfig is Script {
     }
 
     function getAnvilConfig() internal returns (NetworkConfig memory) {
+        if (activeNetworkConfig.priceFeed != address(0)) {
+            return activeNetworkConfig;
+        }
+
         vm.startBroadcast();
-        MockV3Aggregator mockV3Aggregator = new MockV3Aggregator(8, 2500e8);
+        MockV3Aggregator mockV3Aggregator = new MockV3Aggregator(ETH_DECIMAL, ETH_PRICE);
         vm.stopBroadcast();
 
         return NetworkConfig({priceFeed: address(mockV3Aggregator)});
